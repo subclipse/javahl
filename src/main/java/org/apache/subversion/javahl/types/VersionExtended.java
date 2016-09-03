@@ -23,8 +23,6 @@
 
 package org.apache.subversion.javahl.types;
 
-import org.apache.subversion.javahl.NativeResources;
-
 /**
  * Encapsulates information about the compile-time and run-time
  * properties of the Subversion libraries.
@@ -32,29 +30,6 @@ import org.apache.subversion.javahl.NativeResources;
  */
 public class VersionExtended
 {
-    /**
-     * Load the required native library.
-     */
-    static
-    {
-        NativeResources.loadNativeLibrary();
-    }
-
-    /**
-     * Release the native peer. This method must be called to release
-     * the native resources held by this object.
-     * <p>
-     * Once this method is called, all object references obtained from
-     * the iterators returned by {@link #getLinkedLibs()} and
-     * {@link #getLoadedLibs()} become invalid and should no longer be used.
-     */
-    public native void dispose();
-
-    /**
-     * release the native peer (should use dispose instead)
-     */
-    public native void finalize();
-
     /**
      * @return The date when the libsvn_subr library was compiled, in
      * the format defined by the C standard macro #__DATE__.
@@ -70,9 +45,9 @@ public class VersionExtended
     /**
      * @return The canonical host triplet (arch-vendor-osname) of the
      * system where libsvn_subr was compiled.
-     * <p>
-     * <b>Note:</b> On Unix-like systems (includng Mac OS X), this string
-     * is the same as the output of the config.guess script for the
+     *
+     * @note On Unix-like systems (includng Mac OS X), this string is
+     * the same as the output of the config.guess script for the
      * underlying Subversion libraries.
      */
     public native String getBuildHost();
@@ -85,8 +60,8 @@ public class VersionExtended
     /**
      * @return The canonical host triplet (arch-vendor-osname) of the
      * system where the current process is running.
-     * <p>
-     * <b>Note:</b> This string may not be the same as the output of
+     *
+     * @note This string may not be the same as the output of
      * config.guess on the same system.
      */
     public native String getRuntimeHost();
@@ -164,8 +139,8 @@ public class VersionExtended
     /**
      * @return Iterator for an immutable internal list of #LoadedLib
      * describing loaded shared libraries.  The the list may be empty.
-     * <p>
-     * <b>Note:</b> On Mac OS X, the loaded frameworks, private frameworks
+     *
+     * @note On Mac OS X, the loaded frameworks, private frameworks
      * and system libraries will not be listed.
      */
     public java.util.Iterator<LoadedLib> getLoadedLibs()
@@ -203,8 +178,7 @@ public class VersionExtended
 
         /**
          * Implementation of java.util.Iterator#remove().
-         * <p>
-         * <b>Note:</b> Not implemented, all sequences are immutable.
+         * @note Not implemented, all sequences are immutable.
          */
         public void remove()
         {
@@ -245,8 +219,7 @@ public class VersionExtended
 
         /**
          * Implementation of java.util.Iterator#remove().
-         * <p>
-         * <b>Note:</b> Not implemented, all sequences are immutable.
+         * @note Not implemented, all sequences are immutable.
          */
         public void remove()
         {

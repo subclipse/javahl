@@ -173,18 +173,7 @@ class SVNTests extends TestCase
 
     private void init()
     {
-        String disableCredStore = System.getProperty("test.disablecredstore");
-        if (disableCredStore != null)
-        {
-            try {
-                SVNUtil.disableNativeCredentialsStore();
-            } catch(Throwable ex) {
-                System.err.println("*** ERROR: Could not disable" +
-                                   " the native credentials store");
-            }
-        }
-
-        // if not already set, get a useful value for rootDir
+        // if not already set, get a usefull value for rootDir
         if (rootDirectoryName == null)
             rootDirectoryName = System.getProperty("test.rootdir");
         if (rootDirectoryName == null)
@@ -257,11 +246,10 @@ class SVNTests extends TestCase
         greekRepos = new File(localTmp, "repos");
         greekDump = new File(localTmp, "greek_dump");
         admin.create(greekRepos, true,false, null, this.fsType);
-        addExpectedCommitItem(greekFiles.getAbsolutePath(),
-                              makeReposUrl(greekRepos).toString(), null,
-                              NodeKind.dir, CommitItemStateFlags.Add);
+        addExpectedCommitItem(greekFiles.getAbsolutePath(), null, null,
+                              NodeKind.none, CommitItemStateFlags.Add);
         client.doImport(greekFiles.getAbsolutePath(),
-                        makeReposUrl(greekRepos).toString(),
+                       makeReposUrl(greekRepos).toString(),
                         Depth.infinity, false, false, null,
                         new MyCommitMessage(), null);
         admin.dump(greekRepos, new FileOutputStream(greekDump),
@@ -297,140 +285,66 @@ class SVNTests extends TestCase
     {
         this.client = new SVNClient();
         this.client.notification2(new MyNotifier());
-        if (DefaultAuthn.useDeprecated())
-            this.client.setPrompt(DefaultAuthn.getDeprecated());
-        else
-            this.client.setPrompt(DefaultAuthn.getDefault());
+        this.client.setPrompt(new DefaultPromptUserPassword());
         this.client.username(USERNAME);
         this.client.setProgressCallback(new DefaultProgressListener());
         this.client.setConfigDirectory(this.conf.getAbsolutePath());
         this.expectedCommitItems = new HashMap<String, MyCommitItem>();
     }
     /**
-     * the default prompts : never prompt the user, provide default answers
+     * the default prompt : never prompts the user, provides defaults answers
      */
-    protected static class DefaultAuthn
+    protected static class DefaultPromptUserPassword implements UserPasswordCallback
     {
-        public static boolean useDeprecated()
+
+        public int askTrustSSLServer(String info, boolean allowPermanently)
         {
-            String prop = System.getProperty("test.authn.deprecated");
-            return (prop != null && !prop.isEmpty());
+            return UserPasswordCallback.AcceptTemporary;
         }
 
-        public static AuthnCallback getDefault()
+        public String askQuestion(String realm, String question, boolean showAnswer)
         {
-            return new DefaultAuthnCallback();
+            return "";
         }
 
-        @SuppressWarnings("deprecation")
-        public static UserPasswordCallback getDeprecated()
+        public boolean askYesNo(String realm, String question, boolean yesIsDefault)
         {
-            return new DeprecatedAuthnCallback();
+            return yesIsDefault;
         }
 
-        private static class DefaultAuthnCallback
-            implements AuthnCallback
+        public String getPassword()
         {
-            public UsernameResult
-                usernamePrompt(String realm, boolean maySave)
-            {
-                return new UsernameResult(USERNAME);
-            }
-
-            public UserPasswordResult
-                userPasswordPrompt(String realm, String username,
-                                   boolean maySave)
-            {
-                return new UserPasswordResult(USERNAME, PASSWORD);
-            }
-
-            public SSLServerTrustResult
-                sslServerTrustPrompt(String realm,
-                                     SSLServerCertFailures failures,
-                                     SSLServerCertInfo info,
-                                     boolean maySave)
-            {
-                return SSLServerTrustResult.acceptTemporarily();
-            }
-
-            public SSLClientCertResult
-                sslClientCertPrompt(String realm, boolean maySave)
-            {
-                return null;
-            }
-
-            public SSLClientCertPassphraseResult
-                sslClientCertPassphrasePrompt(String realm, boolean maySave)
-            {
-                return null;
-            }
-
-            public boolean allowStorePlaintextPassword(String realm)
-            {
-                return false;
-            }
-
-            public boolean allowStorePlaintextPassphrase(String realm)
-            {
-                return false;
-            }
+            return PASSWORD;
         }
 
-        @SuppressWarnings("deprecation")
-        private static class DeprecatedAuthnCallback
-            implements UserPasswordCallback
+        public String getUsername()
         {
-            public int askTrustSSLServer(String info, boolean allowPermanently)
-            {
-                return UserPasswordCallback.AcceptTemporary;
-            }
+            return USERNAME;
+        }
 
-            public String askQuestion(String realm, String question,
-                                      boolean showAnswer)
-            {
-                return "";
-            }
+        public boolean prompt(String realm, String username)
+        {
+            return false;
+        }
 
-            public boolean askYesNo(String realm, String question,
-                                    boolean yesIsDefault)
-            {
-                return yesIsDefault;
-            }
+        public boolean prompt(String realm, String username, boolean maySave)
+        {
+            return false;
+        }
 
-            public String getPassword()
-            {
-                return PASSWORD;
-            }
+        public String askQuestion(String realm, String question,
+                boolean showAnswer, boolean maySave)
+        {
+            return "";
+        }
 
-            public String getUsername()
-            {
-                return USERNAME;
-            }
-
-            public boolean prompt(String realm, String username)
-            {
-                return true;
-            }
-
-            public boolean prompt(String realm, String username, boolean maySave)
-            {
-                return true;
-            }
-
-            public String askQuestion(String realm, String question,
-                                      boolean showAnswer, boolean maySave)
-            {
-                return "";
-            }
-
-            public boolean userAllowedSave()
-            {
-                return false;
-            }
+        public boolean userAllowedSave()
+        {
+            return false;
         }
     }
 
-    protected static class DefaultProgressListener implements ProgressCallback
+    private static class DefaultProgressListener implements ProgressCallback
     {
 
         public void onProgress(ProgressEvent event)
@@ -868,8 +782,7 @@ class SVNTests extends TestCase
         {
             MyStatusCallback statusCallback = new MyStatusCallback();
             client.status(workingCopy.getAbsolutePath(), Depth.unknown,
-                          checkRepos, false, true, true, false, false,
-                          null, statusCallback);
+                          checkRepos, true, true, false, null, statusCallback);
             wc.check(statusCallback.getStatusArray(),
                     workingCopy.getAbsolutePath(), checkRepos);
         }
@@ -1003,7 +916,7 @@ class SVNTests extends TestCase
 
         public Status[] getStatusArray()
         {
-            return statuses.toArray(new Status[statuses.size()]);
+            return (Status[]) statuses.toArray(new Status[statuses.size()]);
         }
     }
 }

@@ -4,7 +4,7 @@
 
   <groupId>org.apache.subversion</groupId>
   <artifactId>javahl</artifactId>
-  <version>1.9.4</version>
+  <version>1.8.16</version>
   <packaging>jar</packaging>
  
   <name>javahl</name>

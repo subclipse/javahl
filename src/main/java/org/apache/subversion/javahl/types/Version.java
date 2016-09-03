@@ -23,8 +23,6 @@
 
 package org.apache.subversion.javahl.types;
 
-import org.apache.subversion.javahl.NativeResources;
-
 /**
  * Encapsulates version information about the underlying native
  * libraries.  Basically a wrapper for <a
@@ -32,14 +30,6 @@ import org.apache.subversion.javahl.NativeResources;
  */
 public class Version
 {
-    /**
-     * Load the required native library.
-     */
-    static
-    {
-        NativeResources.loadNativeLibrary();
-    }
-
     /**
      * @return The full version string for the loaded JavaHL library,
      * as defined by <code>MAJOR.MINOR.PATCH INFO</code>.

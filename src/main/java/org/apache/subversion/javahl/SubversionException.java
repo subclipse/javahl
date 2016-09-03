@@ -47,16 +47,4 @@ public class SubversionException extends Exception
     {
         super(message);
     }
-
-    /**
-     * This constructor is only used by sub-classes and the native
-     * implementation.
-     *
-     * @param message A description of the problem.
-     * @param cause The root cause of the exception.
-     */
-    protected SubversionException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
 }

@@ -31,10 +31,7 @@ package org.apache.subversion.javahl.callback;
  * <p>This callback can also be used to provide the equivalent of the
  * <code>--no-auth-cache</code> and <code>--non-interactive</code>
  * arguments accepted by the command-line client.</p>
- *
- * @deprecated Use {@see AuthnCallback}.
  */
-@Deprecated
 public interface UserPasswordCallback
 {
     /**

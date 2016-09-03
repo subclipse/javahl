@@ -34,12 +34,11 @@ import java.util.Date;
 
 import org.apache.subversion.javahl.types.*;
 
-import junit.framework.TestCase;
-
+import junit.framework.Assert;
 /**
  * This class describe the expected state of the working copy
  */
-public class WC extends TestCase
+public class WC
 {
     /**
      * the map of the items of the working copy. The relative path is the key
@@ -128,16 +127,6 @@ public class WC extends TestCase
     }
 
     /**
-     * Set the depth of the item at a path
-     * @param path      the path, where the status is set
-     * @param depth     the new depth
-     */
-    public void setItemDepth(String path, Depth depth)
-    {
-        items.get(path).depth = depth;
-    }
-
-    /**
      * Set the revision number of the item at a path
      * @param path      the path, where the revision number is set
      * @param revision  the new revision number
@@ -180,9 +169,9 @@ public class WC extends TestCase
         // since having no content signals a directory, changes of removing the
         // content or setting a former not set content is not allowed. That
         // would change the type of the item.
-        assertNotNull("cannot unset content", content);
+        Assert.assertNotNull("cannot unset content", content);
         Item i = items.get(path);
-        assertNotNull("cannot set content on directory", i.myContent);
+        Assert.assertNotNull("cannot set content on directory", i.myContent);
         i.myContent = content;
     }
 
@@ -315,13 +304,13 @@ public class WC extends TestCase
      */
     void check(DirEntry[] tested, String singleFilePath)
     {
-        assertEquals("not a single dir entry", 1, tested.length);
+        Assert.assertEquals("not a single dir entry", 1, tested.length);
         Item item = items.get(singleFilePath);
-        assertNotNull("not found in working copy", item);
-        assertNotNull("not a file", item.myContent);
-        assertEquals("state says file, working copy not",
-                     tested[0].getNodeKind(),
-                     item.nodeKind == null ? NodeKind.file : item.nodeKind);
+        Assert.assertNotNull("not found in working copy", item);
+        Assert.assertNotNull("not a file", item.myContent);
+        Assert.assertEquals("state says file, working copy not",
+                tested[0].getNodeKind(),
+                item.nodeKind == null ? NodeKind.file : item.nodeKind);
     }
 
     /**
@@ -353,18 +342,19 @@ public class WC extends TestCase
         {
             String name = basePath + entry.getPath();
             Item item = items.get(name);
-            assertNotNull("null paths won't be found in working copy", item);
+            Assert.assertNotNull("null paths won't be found in working copy",
+                                 item);
             if (item.myContent != null)
             {
-                assertEquals("Expected '" + entry + "' to be file",
-                             entry.getNodeKind(),
-                             item.nodeKind == null ? NodeKind.file : item.nodeKind);
+                Assert.assertEquals("Expected '" + entry + "' to be file",
+                        entry.getNodeKind(),
+                        item.nodeKind == null ? NodeKind.file : item.nodeKind);
             }
             else
             {
-                assertEquals("Expected '" + entry + "' to be dir",
-                             entry.getNodeKind(),
-                             item.nodeKind == null ? NodeKind.dir : item.nodeKind);
+                Assert.assertEquals("Expected '" + entry + "' to be dir",
+                        entry.getNodeKind(),
+                        item.nodeKind == null ? NodeKind.dir : item.nodeKind);
             }
             item.touched = true;
         }
@@ -379,9 +369,9 @@ public class WC extends TestCase
                         !item.myPath.equals(basePath))
                 {
                     // Non-recursive checks will fail here.
-                    assertFalse("Expected path '" + item.myPath +
-                                "' not found in dir entries",
-                                recursive);
+                    Assert.assertFalse("Expected path '" + item.myPath +
+                                       "' not found in dir entries",
+                                       recursive);
 
                     // Look deeper under the tree.
                     boolean found = false;
@@ -397,8 +387,8 @@ public class WC extends TestCase
                             }
                         }
                     }
-                    assertTrue("Expected path '" + item.myPath +
-                               "' not found in dir entries", found);
+                    Assert.assertTrue("Expected path '" + item.myPath +
+                                       "' not found in dir entries", found);
                 }
             }
         }
@@ -446,14 +436,14 @@ public class WC extends TestCase
         for (Status status : tested)
         {
             String path = status.getPath();
-            assertTrue("status path starts not with working copy path",
-                       path.startsWith(normalizeWCPath));
+            Assert.assertTrue("status path starts not with working copy path",
+                    path.startsWith(normalizeWCPath));
 
             // we calculate the relative path to the working copy root
             if (path.length() > workingCopyPath.length() + 1)
             {
-                assertEquals("missing '/' in status path",
-                             path.charAt(workingCopyPath.length()), '/');
+                Assert.assertEquals("missing '/' in status path",
+                        path.charAt(workingCopyPath.length()), '/');
                 path = path.substring(workingCopyPath.length() + 1);
             }
             else
@@ -461,26 +451,25 @@ public class WC extends TestCase
                 path = "";
 
             Item item = items.get(path);
-            assertNotNull("status not found in working copy: " + path, item);
-            assertEquals("wrong text status in working copy: " + path,
-                         item.textStatus, status.getTextStatus());
+            Assert.assertNotNull("status not found in working copy: " + path,
+                    item);
+            Assert.assertEquals("wrong text status in working copy: " + path,
+                    item.textStatus, status.getTextStatus());
             if (item.workingCopyRev != -1)
-                assertEquals("wrong revision number in working copy: " + path,
-                             item.workingCopyRev, status.getRevisionNumber());
-            assertEquals("lock status wrong: " + path,
-                         item.isLocked, status.isLocked());
-            assertEquals("switch status wrong: " + path,
-                         item.isSwitched, status.isSwitched());
-            assertEquals("wrong prop status in working copy: " + path,
-                         item.propStatus, status.getPropStatus());
-            if (item.depth != null)
-                assertEquals("wrong ambient depth in working copy: " + path,
-                             item.depth, status.getDepth());
+                Assert.assertEquals("wrong revision number in working copy: "
+                            + path,
+                        item.workingCopyRev, status.getRevisionNumber());
+            Assert.assertEquals("lock status wrong: " + path,
+                    item.isLocked, status.isLocked());
+            Assert.assertEquals("switch status wrong: " + path,
+                    item.isSwitched, status.isSwitched());
+            Assert.assertEquals("wrong prop status in working copy: " + path,
+                    item.propStatus, status.getPropStatus());
             if (item.myContent != null)
             {
-                assertEquals("state says file, working copy not: " + path,
-                             status.getNodeKind(),
-                             item.nodeKind == null ? NodeKind.file : item.nodeKind);
+                Assert.assertEquals("state says file, working copy not: " + path,
+                        status.getNodeKind(),
+                        item.nodeKind == null ? NodeKind.file : item.nodeKind);
                 if (status.getTextStatus() == Status.Kind.normal ||
                         item.checkContent)
                 {
@@ -494,26 +483,26 @@ public class WC extends TestCase
                         buffer.append((char) ch);
                     }
                     rd.close();
-                    assertEquals("content mismatch: " + path,
-                                 buffer.toString(), item.myContent);
+                    Assert.assertEquals("content mismatch: " + path,
+                            buffer.toString(), item.myContent);
                 }
             }
             else
             {
-                assertEquals("state says dir, working copy not: " + path,
-                             status.getNodeKind(),
-                             item.nodeKind == null ? NodeKind.dir : item.nodeKind);
+                Assert.assertEquals("state says dir, working copy not: " + path,
+                        status.getNodeKind(),
+                        item.nodeKind == null ? NodeKind.dir : item.nodeKind);
             }
 
             if (checkRepos)
             {
-                assertEquals("Last commit revisions for OOD path '"
-                             + item.myPath + "' don't match:",
-                             item.reposLastCmtRevision,
-                             status.getReposLastCmtRevisionNumber());
-                assertEquals("Last commit kinds for OOD path '"
-                             + item.myPath + "' don't match:",
-                             item.reposKind, status.getReposKind());
+                Assert.assertEquals("Last commit revisions for OOD path '"
+                                    + item.myPath + "' don't match:",
+                                    item.reposLastCmtRevision,
+                                    status.getReposLastCmtRevisionNumber());
+                Assert.assertEquals("Last commit kinds for OOD path '"
+                                    + item.myPath + "' don't match:",
+                                    item.reposKind, status.getReposKind());
 
                 // Only the last committed rev and kind is available for
                 // paths deleted in the repos.
@@ -522,17 +511,17 @@ public class WC extends TestCase
                     long lastCmtTime =
                         (status.getReposLastCmtDate() == null ?
                          0 : status.getReposLastCmtDate().getTime());
-                    assertEquals("Last commit dates for OOD path '" +
-                                 item.myPath + "' don't match:",
-                                 new Date(item.reposLastCmtDate),
-                                 new Date(lastCmtTime));
-                    assertEquals("Last commit authors for OOD path '"
-                                 + item.myPath + "' don't match:",
-                                 item.reposLastCmtAuthor,
-                                 status.getReposLastCmtAuthor());
-                    assertNotNull("URL for path " + item.myPath
-                                  + " should not be null",
-                                  status.getUrl());
+                    Assert.assertEquals("Last commit dates for OOD path '" +
+                                        item.myPath + "' don't match:",
+                                        new Date(item.reposLastCmtDate),
+                                        new Date(lastCmtTime));
+                    Assert.assertEquals("Last commit authors for OOD path '"
+                                        + item.myPath + "' don't match:",
+                                        item.reposLastCmtAuthor,
+                                        status.getReposLastCmtAuthor());
+                    Assert.assertNotNull("URL for path " + item.myPath
+                                         + " should not be null",
+                                         status.getUrl());
                 }
             }
             item.touched = true;
@@ -542,9 +531,9 @@ public class WC extends TestCase
         // result array
         for (Item item : items.values())
         {
-            assertTrue("item '" + item.myPath +
-                       "' in working copy not found in status",
-                       item.touched);
+            Assert.assertTrue("item '" + item.myPath +
+                              "' in working copy not found in status",
+                    item.touched);
         }
     }
 
@@ -572,11 +561,6 @@ public class WC extends TestCase
          * the property status of the item.
          */
         Status.Kind propStatus = Status.Kind.none;
-
-        /**
-         * the ambient depth of the item.
-         */
-        Depth depth = null;
 
         /**
          * the expected revision number. -1 means do not check.
@@ -651,7 +635,6 @@ public class WC extends TestCase
             myContent = source.myContent;
             textStatus = source.textStatus;
             propStatus = source.propStatus;
-            depth = source.depth;
             owner.items.put(myPath, this);
         }
 

@@ -42,7 +42,7 @@ public class ConflictResult
     private String mergedPath;
 
     /**
-     * Create a new conflict result instance.
+     * Create a new conflict result instace.
      */
     public ConflictResult(Choice choice, String mergedPath)
     {

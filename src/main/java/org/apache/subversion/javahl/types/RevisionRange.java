@@ -29,38 +29,32 @@ package org.apache.subversion.javahl.types;
  */
 public class RevisionRange implements Comparable<RevisionRange>, java.io.Serializable
 {
-    // Update the serialVersionUID when there is a incompatible change made to
-    // this class.  See the java documentation for when a change is incompatible.
-    // http://java.sun.com/javase/7/docs/platform/serialization/spec/version.html#6678
-    private static final long serialVersionUID = 2L;
+    // Update the serialVersionUID when there is a incompatible change
+    // made to this class.  See any of the following, depending upon
+    // the Java release.
+    // http://java.sun.com/j2se/1.3/docs/guide/serialization/spec/version.doc7.html
+    // http://java.sun.com/j2se/1.4/pdf/serial-spec.pdf
+    // http://java.sun.com/j2se/1.5.0/docs/guide/serialization/spec/version.html#6678
+    // http://java.sun.com/javase/6/docs/platform/serialization/spec/version.html#6678
+    private static final long serialVersionUID = 1L;
 
     private Revision from;
     private Revision to;
-    private boolean inheritable;
 
     /**
      * Creates a new instance.  Called by native library.
      */
-    protected RevisionRange(long from, long to, boolean inheritable)
+    @SuppressWarnings("unused")
+    private RevisionRange(long from, long to)
     {
         this.from = Revision.getInstance(from);
         this.to = Revision.getInstance(to);
-        this.inheritable = inheritable;
-    }
-
-    /** @since 1.9 */
-    public RevisionRange(Revision from, Revision to, boolean inheritable)
-    {
-        this.from = from;
-        this.to = to;
-        this.inheritable = inheritable;
     }
 
     public RevisionRange(Revision from, Revision to)
     {
         this.from = from;
         this.to = to;
-        this.inheritable = true;
     }
 
     /**
@@ -75,11 +69,6 @@ public class RevisionRange implements Comparable<RevisionRange>, java.io.Seriali
         {
             return;
         }
-
-        this.inheritable = !revisionElement.endsWith("*");
-        if (!this.inheritable)
-            revisionElement =
-                revisionElement.substring(0, revisionElement.length() - 1);
 
         int hyphen = revisionElement.indexOf('-');
         if (hyphen > 0)
@@ -104,10 +93,8 @@ public class RevisionRange implements Comparable<RevisionRange>, java.io.Seriali
             try
             {
                 long revNum = Long.parseLong(revisionElement.trim());
-                if (revNum <= 0)
-                    return;
-                this.to = new Revision.Number(revNum);
-                this.from = new Revision.Number(revNum - 1);
+                this.from = new Revision.Number(revNum);
+                this.to = this.from;
             }
             catch (NumberFormatException e)
             {
@@ -126,29 +113,14 @@ public class RevisionRange implements Comparable<RevisionRange>, java.io.Seriali
         return to;
     }
 
-    public boolean isInheritable()
-    {
-        return inheritable;
-    }
-
     public String toString()
     {
         if (from != null && to != null)
         {
-            String rep;
-
-            if (from.getKind() == Revision.Kind.number
-                && to.getKind() == Revision.Kind.number
-                && (((Revision.Number)from).getNumber() + 1
-                    == ((Revision.Number)to).getNumber()))
-                rep = to.toString();
-            else if (from.equals(to)) // Such ranges should never happen
-                rep = from.toString();
+            if (from.equals(to))
+                return from.toString();
             else
-                rep = from.toString() + '-' + to.toString();
-            if (!inheritable)
-                return rep + '*';
-            return rep;
+                return from.toString() + '-' + to.toString();
         }
         return super.toString();
     }
@@ -166,7 +138,7 @@ public class RevisionRange implements Comparable<RevisionRange>, java.io.Seriali
     public int hashCode()
     {
         final int prime = 31;
-        int result = (inheritable ? 1 : 2);
+        int result = 1;
         result = prime * result + ((from == null) ? 0 : from.hashCode());
         result = prime * result + ((to == null) ? 0 : to.hashCode());
         return result;
@@ -206,12 +178,10 @@ public class RevisionRange implements Comparable<RevisionRange>, java.io.Seriali
             return false;
         }
 
-        return (inheritable == other.inheritable);
+        return true;
     }
 
     /**
-     * <b>Note:</b> Explicitly ignores inheritable state.
-     *
      * @param range The RevisionRange to compare this object to.
      */
     public int compareTo(RevisionRange range)
