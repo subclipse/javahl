@@ -1,0 +1,8 @@
+<!-- settings.xml -->
+    <servers>
+        <server>
+            <id>bintray-subclipse-maven</id>
+            <username>${env.BINTRAY_USERNAME}</username>
+            <password>${env.BINTRAY_PASSWORD}</password>
+        </server>
+    </servers>

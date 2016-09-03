@@ -35,4 +35,11 @@
 			</plugin>
 		</plugins>
 	</build>
+<distributionManagement>
+    <repository>
+        <id>bintray-subclipse-maven</id>
+        <name>subclipse-maven</name>
+        <url>https://api.bintray.com/maven/subclipse/maven/svn-javahl/;publish=1</url>
+    </repository>
+</distributionManagement>
 </project>
