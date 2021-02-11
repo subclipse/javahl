@@ -8,7 +8,7 @@
   <packaging>jar</packaging>
  
   <name>javahl</name>
-  <url>http://maven.apache.org</url>
+  <url>https://github.com/subclipse/javahl</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,8 +29,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.3.2</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.8</source>
+					<target>1.8</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -55,6 +55,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.2.0</version>
 				<configuration>
 					<archive>
 						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
@@ -64,11 +65,13 @@
 
 		</plugins>
 	</build>
-<distributionManagement>
-    <repository>
-        <id>bintray-subclipse-maven</id>
-        <name>subclipse-maven</name>
-        <url>https://api.bintray.com/maven/subclipse/maven/svn-javahl/;publish=1</url>
-    </repository>
-</distributionManagement>
+
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/subclipse/javahl</url>
+		</repository>
+	</distributionManagement>
+
 </project>
