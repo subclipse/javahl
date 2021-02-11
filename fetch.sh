@@ -1,5 +1,5 @@
 # Script to refresh source code from upstream tag
-VERSION=1.14.0-rc2
+VERSION=1.14.1
 rm -rf src/main/java
 rm -rf src/test/java
 svn export http://svn.apache.org/repos/asf/subversion/tags/$VERSION/subversion/bindings/javahl/src/ src/main/java
